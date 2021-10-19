@@ -1,0 +1,51 @@
+SELECT artist_mb, scrobbles_lastfm FROM artists
+ORDER BY scrobbles_lastfm DESC LIMIT 1;
+
+1	The Beatles	517126254
+
+SELECT tag, count(1) AS cc
+FROM artists LATERAL VIEW explode(tags_lastfm) some_table AS tag
+GROUP BY tag ORDER BY cc DESC LIMIT 1;
+ 
+  	tag          cc
+1   seen live   81278
+
+SELECT artist_mb, listeners_lastfm
+FROM artists, 
+(SELECT tag, count(1) AS cc
+FROM artists LATERAL VIEW explode(tags_lastfm) some_table AS tag
+GROUP BY tag ORDER BY cc DESC LIMIT 10) o
+WHERE array_contains(tags_lastfm, o.tag) = TRUE 
+GROUP BY artist_mb, listeners_lastfm 
+ORDER BY listeners_lastfm DESC LIMIT 10;
+
+    artist_mb   listeners_lastfm
+1   Coldplay    5381567
+2   Radiohead   4732528
+3   Red Hot Chili Peppers   4620835
+4   Rihanna     4558193
+5   Eminem      4517997
+6   The Killers 4428868
+7   Kanye West  4390502
+8   Nirvana     4272894
+9   Muse        4089612
+10  Queen       4023379
+
+Top 10 Russian tags
+SELECT tag, count(1) AS cc
+FROM artists LATERAL VIEW explode(tags_lastfm) some_table AS tag
+WHERE country_lastfm = "Russia" 
+GROUP BY tag 
+ORDER BY cc DESC LIMIT 10;
+
+    tag         cc
+1   russian     4266
+2   Russia      1703
+3   seen live   1605
+4   under 2000 listeners    1208
+5   electronic	1145
+6   rock        1056
+7   experimental    887
+8   metal       702
+9   russian rock    603
+10  ambient     589
